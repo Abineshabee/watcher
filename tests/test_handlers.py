@@ -4,9 +4,8 @@
 # Full coverage for watcher/handlers.py
 # -----------------------------------------------------------------------------
 
-import pytest
 import pandas as pd
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from watcher.handlers import (
     HandlerBase,
@@ -28,6 +27,7 @@ from watcher.stats import StepStats, ColumnDiff, JoinExplosionDetail
 # =============================================================================
 # Helpers
 # =============================================================================
+
 
 def _make_step(
     func_name="test_step",
@@ -72,8 +72,8 @@ def _make_session(name="test session") -> WatcherSession:
 # HandlerBase — default no-op methods
 # =============================================================================
 
-class TestHandlerBase:
 
+class TestHandlerBase:
     def test_on_step_is_noop(self):
         h = HandlerBase()
         step = _make_step()
@@ -127,8 +127,8 @@ class TestHandlerBase:
 # TerminalHandler — delegates to Reporter
 # =============================================================================
 
-class TestTerminalHandler:
 
+class TestTerminalHandler:
     def test_instantiates_without_error(self):
         h = TerminalHandler()
         assert h is not None
@@ -162,16 +162,18 @@ class TestTerminalHandler:
 # register_handler / deregister_handler / _get_handlers
 # =============================================================================
 
-class TestHandlerRegistry:
 
+class TestHandlerRegistry:
     def setup_method(self):
         """Snapshot handlers before each test and restore after."""
         from watcher import handlers as _h
+
         self._original = list(_h._handlers)
 
     def teardown_method(self):
         """Restore original handler list after each test."""
         from watcher import handlers as _h
+
         _h._handlers[:] = self._original
 
     def test_get_handlers_returns_list(self):
@@ -209,6 +211,7 @@ class TestHandlerRegistry:
         class CountingHandler(HandlerBase):
             def __init__(self, name):
                 self.name = name
+
             def on_step(self, step):
                 calls.append(self.name)
 
@@ -260,6 +263,7 @@ class TestHandlerRegistry:
         class EventHandler(HandlerBase):
             def on_session_start(self, sess):
                 events.append(("start", sess.name))
+
             def on_session_end(self, sess):
                 events.append(("end", sess.name))
 
@@ -283,6 +287,7 @@ class TestHandlerRegistry:
     def test_deregister_terminal_handler_silences_output(self):
         """Removing TerminalHandler means no output is printed."""
         from watcher import handlers as _h
+
         terminal = next(h for h in _h._handlers if isinstance(h, TerminalHandler))
         deregister_handler(terminal)
 

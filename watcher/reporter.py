@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     # Avoid circular imports — core types are referenced by annotation only.
@@ -99,21 +99,21 @@ class _PlainConsole:
 # -----------------------------------------------------------------------------
 
 # Symbols used in the step summary line
-_SYMBOL_GAIN    = "▲"   # rows gained
-_SYMBOL_LOSS    = "▼"   # rows lost
-_SYMBOL_STABLE  = "●"   # no row change
-_SYMBOL_WARN    = "⚠"   # threshold triggered
+_SYMBOL_GAIN = "▲"  # rows gained
+_SYMBOL_LOSS = "▼"  # rows lost
+_SYMBOL_STABLE = "●"  # no row change
+_SYMBOL_WARN = "⚠"  # threshold triggered
 _SYMBOL_EXPLODE = "💥"  # join explosion
 
 # Rich colour tokens
-_COLOR_GAIN     = "green"
-_COLOR_LOSS     = "red"
-_COLOR_STABLE   = "dim"
-_COLOR_WARN     = "yellow"
-_COLOR_EXPLODE  = "bold red"
-_COLOR_HEADER   = "bold cyan"
-_COLOR_DRIFT    = "magenta"
-_COLOR_DIM      = "dim"
+_COLOR_GAIN = "green"
+_COLOR_LOSS = "red"
+_COLOR_STABLE = "dim"
+_COLOR_WARN = "yellow"
+_COLOR_EXPLODE = "bold red"
+_COLOR_HEADER = "bold cyan"
+_COLOR_DRIFT = "magenta"
+_COLOR_DIM = "dim"
 
 
 # -----------------------------------------------------------------------------
@@ -161,11 +161,11 @@ class Reporter:
         show_schema_drift: bool = True,
         show_join_detail: bool = True,
     ) -> None:
-        self.width             = width
-        self.show_memory       = show_memory
-        self.show_null_deltas  = show_null_deltas
+        self.width = width
+        self.show_memory = show_memory
+        self.show_null_deltas = show_null_deltas
         self.show_schema_drift = show_schema_drift
-        self.show_join_detail  = show_join_detail
+        self.show_join_detail = show_join_detail
 
     # ------------------------------------------------------------------
     # Public rendering methods
@@ -249,7 +249,7 @@ class Reporter:
         )
 
         diff_str = _fmt_diff(step.row_diff, step.row_diff_pct)
-        mem_str  = (
+        mem_str = (
             f"  [{_COLOR_DIM}]mem {step.memory_delta_mb:+.1f} MB "
             f"({step.memory_mode.value})[/]"
             if self.show_memory
@@ -297,16 +297,15 @@ class Reporter:
         for dc in step.stats.dtype_changes:
             color = _COLOR_DIM if dc.is_widening else _COLOR_WARN
             console.print(
-                f"  dtype change    : [{color}]{dc.column} "
-                f"{dc.before} → {dc.after}[/]"
+                f"  dtype change    : [{color}]{dc.column} {dc.before} → {dc.after}[/]"
             )
 
     def _rich_null_deltas(self, console: Any, step: StepResult) -> None:
         """Render the null-count delta block (top 5 worst changes)."""
         top = step.stats.null_deltas[:5]
         for nd in top:
-            sign   = "+" if nd.delta > 0 else ""
-            color  = _COLOR_WARN if nd.delta > 0 else _COLOR_GAIN
+            sign = "+" if nd.delta > 0 else ""
+            color = _COLOR_WARN if nd.delta > 0 else _COLOR_GAIN
             console.print(
                 f"  nulls [{color}]{sign}{nd.delta:,}[/]  "
                 f"[{_COLOR_DIM}]{nd.column}  "
@@ -327,11 +326,11 @@ class Reporter:
             title_style=f"bold {_COLOR_WARN}",
             width=min(self.width, 80),
         )
-        table.add_column("key column",   style="bold")
-        table.add_column("top value",    style=_COLOR_DIM)
+        table.add_column("key column", style="bold")
+        table.add_column("top value", style=_COLOR_DIM)
         table.add_column("repeat count", justify="right", style=_COLOR_LOSS)
 
-        for col in expl.offending_columns[:3]:   # show worst 3 columns
+        for col in expl.offending_columns[:3]:  # show worst 3 columns
             for value, count in expl.top_offenders.get(col, [])[:3]:
                 table.add_row(col, str(value), f"{count:,}")
 
@@ -339,24 +338,28 @@ class Reporter:
 
     def _rich_session_footer(self, console: Any, summary: dict) -> None:
         """Render the session summary panel using Rich."""
-        rows_in   = summary["total_rows_in"]
-        rows_out  = summary["total_rows_out"]
-        net       = rows_out - rows_in
-        sign      = "+" if net >= 0 else ""
-        mem       = summary["total_memory_delta_mb"]
-        elapsed   = summary["total_elapsed_s"]
+        rows_in = summary["total_rows_in"]
+        rows_out = summary["total_rows_out"]
+        net = rows_out - rows_in
+        sign = "+" if net >= 0 else ""
+        mem = summary["total_memory_delta_mb"]
+        elapsed = summary["total_elapsed_s"]
 
         table = Table(box=box.SIMPLE, show_header=True, header_style="bold")
         table.add_column("step")
-        table.add_column("rows in",    justify="right")
-        table.add_column("rows out",   justify="right")
-        table.add_column("Δ rows",     justify="right")
-        table.add_column("time (ms)",  justify="right")
-        table.add_column("mem (MB)",   justify="right")
+        table.add_column("rows in", justify="right")
+        table.add_column("rows out", justify="right")
+        table.add_column("Δ rows", justify="right")
+        table.add_column("time (ms)", justify="right")
+        table.add_column("mem (MB)", justify="right")
 
         for s in summary["steps"]:
-            diff  = s["diff"]
-            color = _COLOR_GAIN if diff < 0 else (_COLOR_LOSS if diff > 0 else _COLOR_STABLE)
+            diff = s["diff"]
+            color = (
+                _COLOR_GAIN
+                if diff < 0
+                else (_COLOR_LOSS if diff > 0 else _COLOR_STABLE)
+            )
             sign_ = "+" if diff > 0 else ""
             table.add_row(
                 s["func"],
@@ -390,10 +393,10 @@ class Reporter:
     def _plain_step(self, console: _PlainConsole, step: StepResult) -> None:
         """Render a step line without Rich."""
         sym, _ = _row_direction(step)
-        diff   = _fmt_diff(step.row_diff, step.row_diff_pct)
-        warn   = f"  {_SYMBOL_WARN}" if step.warned else ""
-        expl   = f"  {_SYMBOL_EXPLODE} join explosion" if step.is_join_explosion else ""
-        mem    = (
+        diff = _fmt_diff(step.row_diff, step.row_diff_pct)
+        warn = f"  {_SYMBOL_WARN}" if step.warned else ""
+        expl = f"  {_SYMBOL_EXPLODE} join explosion" if step.is_join_explosion else ""
+        mem = (
             f"  mem {step.memory_delta_mb:+.1f} MB ({step.memory_mode.value})"
             if self.show_memory
             else ""
@@ -442,7 +445,7 @@ class Reporter:
                 f"{s['memory_delta_mb']:>+7.1f} MB"
             )
         console.rule()
-        net  = summary["total_rows_out"] - summary["total_rows_in"]
+        net = summary["total_rows_out"] - summary["total_rows_in"]
         sign = "+" if net > 0 else ""
         console.print(
             f"  {'TOTAL':30s}  "

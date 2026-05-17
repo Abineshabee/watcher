@@ -18,8 +18,8 @@ from watcher.exceptions import (
 # WatcherError — base exception
 # =============================================================================
 
-class TestWatcherError:
 
+class TestWatcherError:
     def test_is_exception(self):
         assert issubclass(WatcherError, Exception)
 
@@ -48,13 +48,14 @@ class TestWatcherError:
 # WatcherWarning — base warning
 # =============================================================================
 
-class TestWatcherWarning:
 
+class TestWatcherWarning:
     def test_is_user_warning(self):
         assert issubclass(WatcherWarning, UserWarning)
 
     def test_can_be_issued(self):
         import warnings
+
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             warnings.warn("soft alert", WatcherWarning)
@@ -63,6 +64,7 @@ class TestWatcherWarning:
 
     def test_can_be_caught_by_category(self):
         import warnings
+
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always", WatcherWarning)
             warnings.warn("test", WatcherWarning)
@@ -70,6 +72,7 @@ class TestWatcherWarning:
 
     def test_can_be_turned_into_error(self):
         import warnings
+
         with warnings.catch_warnings():
             warnings.simplefilter("error", WatcherWarning)
             with pytest.raises(WatcherWarning):
@@ -80,8 +83,8 @@ class TestWatcherWarning:
 # ThresholdExceeded
 # =============================================================================
 
-class TestThresholdExceeded:
 
+class TestThresholdExceeded:
     def test_is_watcher_error(self):
         assert issubclass(ThresholdExceeded, WatcherError)
 
@@ -113,8 +116,8 @@ class TestThresholdExceeded:
 # BackendError
 # =============================================================================
 
-class TestBackendError:
 
+class TestBackendError:
     def test_is_watcher_error(self):
         assert issubclass(BackendError, WatcherError)
 
@@ -173,8 +176,8 @@ class TestBackendError:
 # ConfigurationError
 # =============================================================================
 
-class TestConfigurationError:
 
+class TestConfigurationError:
     def test_is_watcher_error(self):
         assert issubclass(ConfigurationError, WatcherError)
 

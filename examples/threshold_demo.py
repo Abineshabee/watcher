@@ -13,7 +13,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from watcher import watch, session
+from watcher import watch
 from watcher.exceptions import ThresholdExceeded, WatcherWarning
 
 rng = np.random.default_rng(0)
@@ -23,18 +23,18 @@ rng = np.random.default_rng(0)
 # -----------------------------------------------------------------------------
 df_base = pd.DataFrame(
     {
-        "order_id":    np.arange(10_000),
+        "order_id": np.arange(10_000),
         "customer_id": rng.integers(1, 2_000, size=10_000),
-        "status":      rng.choice(["active", "cancelled"], size=10_000, p=[0.7, 0.3]),
-        "revenue":     rng.uniform(10.0, 400.0, size=10_000).round(2),
+        "status": rng.choice(["active", "cancelled"], size=10_000, p=[0.7, 0.3]),
+        "revenue": rng.uniform(10.0, 400.0, size=10_000).round(2),
     }
 )
 
 # Duplicate customer reference table — will cause join fan-out when merged
 customer_ref = pd.DataFrame(
     {
-        "customer_id": np.repeat(np.arange(1, 2_001), 2),   # every ID appears twice
-        "tier":        rng.choice(["gold", "silver", "bronze"], size=4_000),
+        "customer_id": np.repeat(np.arange(1, 2_001), 2),  # every ID appears twice
+        "tier": rng.choice(["gold", "silver", "bronze"], size=4_000),
     }
 )
 

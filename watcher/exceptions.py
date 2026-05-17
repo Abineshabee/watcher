@@ -155,7 +155,9 @@ class BackendError(WatcherError):
     def __str__(self) -> str:
         parts = [f"[watcher/{self.backend_name}] {self.message}"]
         if self.original is not None:
-            parts.append(f"  Caused by: {type(self.original).__name__}: {self.original}")
+            parts.append(
+                f"  Caused by: {type(self.original).__name__}: {self.original}"
+            )
         return "\n".join(parts)
 
 

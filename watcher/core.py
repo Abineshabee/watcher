@@ -26,13 +26,12 @@ from typing import (
     List,
     Optional,
     Protocol,
-    TypeVar,
     Union,
     runtime_checkable,
 )
 
 from watcher.exceptions import ThresholdExceeded, WatcherWarning
-from watcher.handlers import HandlerBase, TerminalHandler, _get_handlers
+from watcher.handlers import _get_handlers
 from watcher.stats import StepStats, compute_stats, _PandasStatsBackend
 
 # -----------------------------------------------------------------------------
@@ -448,8 +447,8 @@ class WatcherSession:
 # Each thread / asyncio Task that calls session() gets its own slot.
 # -----------------------------------------------------------------------------
 
-_SESSION_VAR: contextvars.ContextVar[Optional[WatcherSession]] = (
-    contextvars.ContextVar("watcher_active_session", default=None)
+_SESSION_VAR: contextvars.ContextVar[Optional[WatcherSession]] = contextvars.ContextVar(
+    "watcher_active_session", default=None
 )
 
 

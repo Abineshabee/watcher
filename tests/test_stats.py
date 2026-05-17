@@ -25,7 +25,6 @@ import warnings
 from typing import Any
 
 import pandas as pd
-import numpy as np
 import pytest
 
 from watcher.exceptions import WatcherWarning
@@ -139,7 +138,7 @@ class TestPandasDtypeChanges:
 
     def test_detects_narrowing(self):
         before = _df(a=pd.array([1, 2, 3], dtype="int64"))
-        after  = _df(a=pd.array([1, 2, 3], dtype="int32"))
+        after = _df(a=pd.array([1, 2, 3], dtype="int32"))
         result = _pandas_dtype_changes(before, after, ["a"])
         assert len(result) == 1
         assert result[0].column == "a"
@@ -147,20 +146,22 @@ class TestPandasDtypeChanges:
 
     def test_detects_widening(self):
         before = _df(a=pd.array([1, 2, 3], dtype="int32"))
-        after  = _df(a=pd.array([1, 2, 3], dtype="int64"))
+        after = _df(a=pd.array([1, 2, 3], dtype="int64"))
         result = _pandas_dtype_changes(before, after, ["a"])
         assert len(result) == 1
         assert result[0].is_widening is True
 
     def test_multiple_columns(self):
         before = _df(a=pd.array([1], dtype="int32"), b=pd.array([1.0], dtype="float32"))
-        after  = _df(a=pd.array([1], dtype="int64"), b=pd.array([1.0], dtype="float64"))
+        after = _df(a=pd.array([1], dtype="int64"), b=pd.array([1.0], dtype="float64"))
         result = _pandas_dtype_changes(before, after, ["a", "b"])
         assert len(result) == 2
 
     def test_type_coercion_to_object(self):
         before = _df(a=pd.array([1, 2], dtype="float64"))
-        after  = pd.DataFrame({"a": ["x", "y"]})  # object or str dtype depending on pandas version
+        after = pd.DataFrame(
+            {"a": ["x", "y"]}
+        )  # object or str dtype depending on pandas version
         result = _pandas_dtype_changes(before, after, ["a"])
         assert result[0].before == "float64"
         # pandas < 2.0 infers "object"; pandas >= 2.0 infers "str" (StringDtype)
@@ -181,7 +182,7 @@ class TestPandasNullDeltas:
 
     def test_new_nulls_detected(self):
         before = _df(a=[1, 2, 3])
-        after  = _df(a=[1, None, None])
+        after = _df(a=[1, None, None])
         result = _pandas_null_deltas(before, after, ["a"])
         assert len(result) == 1
         assert result[0].delta > 0
@@ -189,14 +190,14 @@ class TestPandasNullDeltas:
 
     def test_nulls_removed(self):
         before = _df(a=[None, None, 3])
-        after  = _df(a=[1, 2, 3])
+        after = _df(a=[1, 2, 3])
         result = _pandas_null_deltas(before, after, ["a"])
         assert len(result) == 1
         assert result[0].delta < 0
 
     def test_sorted_by_abs_delta_descending(self):
         before = _df(a=[1, 2, 3, 4], b=[1, 2, 3, 4])
-        after  = _df(a=[None, None, None, 4], b=[None, 2, 3, 4])  # a: +3, b: +1
+        after = _df(a=[None, None, None, 4], b=[None, 2, 3, 4])  # a: +3, b: +1
         result = _pandas_null_deltas(before, after, ["a", "b"])
         assert result[0].column == "a"  # worst first
 
@@ -215,7 +216,7 @@ class TestPandasNullDeltas:
 class TestPandasJoinExplosion:
     def test_no_gain_still_returns_detail(self):
         before = _df(customer_id=[1, 2, 3])
-        after  = _df(customer_id=[1, 2])   # rows lost, not gained — caller guards
+        after = _df(customer_id=[1, 2])  # rows lost, not gained — caller guards
         result = _pandas_join_explosion(before, after, ["customer_id"], 50_000)
         # duplication_ratio is negative when rows lost
         assert isinstance(result, JoinExplosionDetail)
@@ -223,7 +224,7 @@ class TestPandasJoinExplosion:
     def test_detects_key_duplication(self):
         before = _df(customer_id=[1, 2, 3])
         # Simulating a fan-out: customer_id=1 appears 3× in the output
-        after  = _df(customer_id=[1, 1, 1, 2, 3])
+        after = _df(customer_id=[1, 1, 1, 2, 3])
         result = _pandas_join_explosion(before, after, ["customer_id"], 50_000)
         assert result.duplicate_key_detected is True
         assert "customer_id" in result.offending_columns
@@ -231,14 +232,14 @@ class TestPandasJoinExplosion:
     def test_no_key_columns_returns_no_detection(self):
         # Columns have names with no key suffix and are string dtype
         before = _df(name=["alice", "bob"])
-        after  = _df(name=["alice", "alice", "bob"])
+        after = _df(name=["alice", "alice", "bob"])
         result = _pandas_join_explosion(before, after, ["name"], 50_000)
         # "name" doesn't match any key suffix and isn't int dtype
         assert result.duplicate_key_detected is False
 
     def test_top_offenders_populated(self):
         before = _df(order_id=[1, 2, 3])
-        after  = _df(order_id=[1, 1, 1, 2, 3])
+        after = _df(order_id=[1, 1, 1, 2, 3])
         result = _pandas_join_explosion(before, after, ["order_id"], 50_000)
         # "order_id" ends with "_id" → candidate key
         if result.duplicate_key_detected:
@@ -248,7 +249,7 @@ class TestPandasJoinExplosion:
     def test_integer_column_considered_key_candidate(self):
         """Integer-typed columns should be treated as potential join keys."""
         before = pd.DataFrame({"val": pd.array([1, 2, 3], dtype="int64")})
-        after  = pd.DataFrame({"val": pd.array([1, 1, 1, 2, 3], dtype="int64")})
+        after = pd.DataFrame({"val": pd.array([1, 1, 1, 2, 3], dtype="int64")})
         result = _pandas_join_explosion(before, after, ["val"], 50_000)
         # int column → candidate; should detect duplication
         assert result.duplicate_key_detected is True
@@ -267,7 +268,7 @@ class TestComputeStats:
 
     def test_schema_drift_detected(self):
         before = _df(a=[1, 2], b=[3, 4])
-        after  = _df(a=[1, 2], c=[5, 6])   # b removed, c added
+        after = _df(a=[1, 2], c=[5, 6])  # b removed, c added
         result = compute_stats(before, after)
         assert "c" in result.column_diff.added
         assert "b" in result.column_diff.removed
@@ -279,14 +280,14 @@ class TestComputeStats:
 
     def test_dtype_changes_surfaced(self):
         before = _df(a=pd.array([1, 2], dtype="int32"))
-        after  = _df(a=pd.array([1, 2], dtype="int64"))
+        after = _df(a=pd.array([1, 2], dtype="int64"))
         result = compute_stats(before, after)
         assert len(result.dtype_changes) == 1
         assert result.dtype_changes[0].column == "a"
 
     def test_null_deltas_surfaced(self):
         before = _df(a=[1, 2, 3])
-        after  = _df(a=[None, 2, 3])
+        after = _df(a=[None, 2, 3])
         result = compute_stats(before, after)
         assert any(nd.column == "a" for nd in result.null_deltas)
 
@@ -312,12 +313,14 @@ class TestComputeStats:
     def test_backend_exception_returns_empty_and_warns(self):
         """If the backend raises unexpectedly, compute_stats returns empty stats."""
         import watcher.stats as stats_mod
+
         original = stats_mod._BACKENDS[:]
 
         class BrokenBackend:
             @staticmethod
             def accepts(obj: Any) -> bool:
                 return True
+
             def compute(self, *args, **kwargs):
                 raise RuntimeError("simulated backend failure")
 
@@ -334,13 +337,13 @@ class TestComputeStats:
 
     def test_join_explosion_detected_on_row_gain(self):
         before = _df(customer_id=[1, 2, 3])
-        after  = _df(customer_id=[1, 1, 1, 2, 3])
+        after = _df(customer_id=[1, 1, 1, 2, 3])
         result = compute_stats(before, after)
         assert result.duplicate_key_detected is True
 
     def test_join_explosion_not_set_on_row_loss(self):
         before = _df(customer_id=[1, 2, 3])
-        after  = _df(customer_id=[1, 2])
+        after = _df(customer_id=[1, 2])
         result = compute_stats(before, after)
         assert result.duplicate_key_detected is False
 

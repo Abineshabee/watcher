@@ -78,6 +78,7 @@ class TerminalHandler(HandlerBase):
     def __init__(self) -> None:
         # Lazy import to avoid circular imports at module level
         from watcher.reporter import Reporter
+
         self._reporter = Reporter()
 
     def on_session_start(self, session: WatcherSession) -> None:

@@ -22,12 +22,10 @@
 
 from __future__ import annotations
 
-import sys
 from io import StringIO
 from typing import List
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-import pandas as pd
 import pytest
 
 try:
@@ -106,7 +104,7 @@ def _make_step(
 
 def _make_session(steps: List[StepResult] | None = None) -> WatcherSession:
     sess = WatcherSession(name="test pipeline")
-    for step in (steps or [_make_step()]):
+    for step in steps or [_make_step()]:
         sess.record(step)
     return sess
 
@@ -122,6 +120,7 @@ def _capture(fn):
     with patch("watcher.reporter._console", None):
         # Patch out Rich so we always get plain text in tests
         import watcher.reporter as reporter_mod
+
         original = reporter_mod._RICH_AVAILABLE
         reporter_mod._RICH_AVAILABLE = False
         try:
@@ -251,6 +250,7 @@ class TestPrintSessionHeader:
     def test_rich_path_called_when_rich_available(self):
         """When Rich is available, the rule should render without error."""
         import watcher.reporter as reporter_mod
+
         if not reporter_mod._RICH_AVAILABLE:
             pytest.skip("Rich not installed")
 
@@ -315,7 +315,7 @@ class TestPrintStep:
         r = Reporter()
         step = _make_step(
             rows_in=100,
-            rows_out=160,   # > 50 % gain → heuristic fires even without key
+            rows_out=160,  # > 50 % gain → heuristic fires even without key
             stats=_make_stats(
                 duplicate_key=True,
                 duplication_ratio=0.6,
@@ -337,6 +337,7 @@ class TestPrintStep:
 
     def test_sampling_footnote_shown(self):
         import watcher.reporter as reporter_mod
+
         if not reporter_mod._RICH_AVAILABLE:
             pytest.skip("Rich not installed — sampling footnote is Rich-only")
 
@@ -373,10 +374,12 @@ class TestPrintStep:
 class TestPrintSessionFooter:
     def test_plain_footer_contains_step_names(self):
         r = Reporter()
-        sess = _make_session([
-            _make_step(func_name="clean"),
-            _make_step(func_name="merge", rows_in=900, rows_out=950),
-        ])
+        sess = _make_session(
+            [
+                _make_step(func_name="clean"),
+                _make_step(func_name="merge", rows_in=900, rows_out=950),
+            ]
+        )
         output = _capture(lambda: r.print_session_footer(sess))
         assert "clean" in output
         assert "merge" in output
@@ -395,6 +398,7 @@ class TestPrintSessionFooter:
 
     def test_rich_session_footer_runs_without_error(self):
         import watcher.reporter as reporter_mod
+
         if not reporter_mod._RICH_AVAILABLE:
             pytest.skip("Rich not installed")
 
@@ -413,6 +417,7 @@ class TestPrintSessionFooter:
 class TestRichDegradation:
     def test_print_step_works_without_rich(self):
         import watcher.reporter as reporter_mod
+
         original = reporter_mod._RICH_AVAILABLE
         try:
             reporter_mod._RICH_AVAILABLE = False
@@ -428,6 +433,7 @@ class TestRichDegradation:
 
     def test_session_header_works_without_rich(self):
         import watcher.reporter as reporter_mod
+
         original = reporter_mod._RICH_AVAILABLE
         try:
             reporter_mod._RICH_AVAILABLE = False

@@ -25,10 +25,10 @@
 from __future__ import annotations
 
 import warnings
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
-from watcher.exceptions import BackendError, WatcherWarning
+from watcher.exceptions import WatcherWarning
 
 # Rows above this threshold trigger sampling before computing column stats.
 # Override globally via watcher.config.stats_sample_size.
@@ -122,10 +122,10 @@ class NullDelta:
         Signed difference (positive = more nulls introduced).
     """
 
-    column : str
-    before : int
-    after  : int
-    delta  : int
+    column: str
+    before: int
+    after: int
+    delta: int
 
 
 @dataclass(frozen=True)
@@ -396,6 +396,7 @@ class _PandasStatsBackend(_StatsBackend):
         """
         try:
             import pandas as pd  # noqa: PLC0415
+
             return isinstance(obj, pd.DataFrame)
         except ImportError:
             return False
@@ -433,11 +434,11 @@ class _PandasStatsBackend(_StatsBackend):
         import pandas as pd  # noqa: PLC0415
 
         cols_before = set(before.columns)
-        cols_after  = set(after.columns)
+        cols_after = set(after.columns)
 
         # ---- 1. Schema drift --------------------------------------------
         column_diff = ColumnDiff(
-            added  =sorted(cols_after  - cols_before),
+            added=sorted(cols_after - cols_before),
             removed=sorted(cols_before - cols_after),
         )
 
@@ -445,21 +446,21 @@ class _PandasStatsBackend(_StatsBackend):
         shared = sorted(cols_before & cols_after)
 
         # Apply sampling for large DataFrames
-        sampled     = False
+        sampled = False
         sample_used = 0
 
         if sample_size > 0 and (len(before) > sample_size or len(after) > sample_size):
-            sampled     = True
+            sampled = True
             sample_used = sample_size
             before_s: pd.DataFrame = before[shared].sample(
                 n=min(sample_size, len(before)), random_state=42
             )
-            after_s: pd.DataFrame  = after[shared].sample(
-                n=min(sample_size, len(after)),  random_state=42
+            after_s: pd.DataFrame = after[shared].sample(
+                n=min(sample_size, len(after)), random_state=42
             )
         else:
             before_s = before[shared]
-            after_s  = after[shared]
+            after_s = after[shared]
 
         # ---- 2. Dtype changes -------------------------------------------
         dtype_changes = _pandas_dtype_changes(before_s, after_s, shared)
@@ -485,14 +486,14 @@ class _PandasStatsBackend(_StatsBackend):
             )
 
         return StepStats(
-            column_diff           =column_diff,
-            dtype_changes         =dtype_changes,
-            null_deltas           =null_deltas,
+            column_diff=column_diff,
+            dtype_changes=dtype_changes,
+            null_deltas=null_deltas,
             duplicate_key_detected=explosion.duplicate_key_detected,
-            join_explosion        =explosion,
-            sampled               =sampled,
-            sample_size           =sample_used,
-            backend               ="pandas",
+            join_explosion=explosion,
+            sampled=sampled,
+            sample_size=sample_used,
+            backend="pandas",
         )
 
 
@@ -502,16 +503,16 @@ class _PandasStatsBackend(_StatsBackend):
 
 # Dtypes considered safe widenings (before → after direction only)
 _WIDENING_PAIRS: set[tuple[str, str]] = {
-    ("int8",   "int16"),
-    ("int8",   "int32"),
-    ("int8",   "int64"),
-    ("int16",  "int32"),
-    ("int16",  "int64"),
-    ("int32",  "int64"),
-    ("float32","float64"),
-    ("uint8",  "uint16"),
-    ("uint8",  "uint32"),
-    ("uint8",  "uint64"),
+    ("int8", "int16"),
+    ("int8", "int32"),
+    ("int8", "int64"),
+    ("int16", "int32"),
+    ("int16", "int64"),
+    ("int32", "int64"),
+    ("float32", "float64"),
+    ("uint8", "uint16"),
+    ("uint8", "uint32"),
+    ("uint8", "uint64"),
     ("uint16", "uint32"),
     ("uint16", "uint64"),
     ("uint32", "uint64"),
@@ -548,9 +549,9 @@ def _pandas_dtype_changes(
             is_widening = (b_dtype, a_dtype) in _WIDENING_PAIRS
             changes.append(
                 DtypeChange(
-                    column    =col,
-                    before    =b_dtype,
-                    after     =a_dtype,
+                    column=col,
+                    before=b_dtype,
+                    after=a_dtype,
                     is_widening=is_widening,
                 )
             )
@@ -586,7 +587,7 @@ def _pandas_null_deltas(
     for col in shared:
         b_nulls = int(before[col].isna().sum())
         a_nulls = int(after[col].isna().sum())
-        diff    = a_nulls - b_nulls
+        diff = a_nulls - b_nulls
         if diff != 0:
             deltas.append(
                 NullDelta(column=col, before=b_nulls, after=a_nulls, delta=diff)
@@ -642,7 +643,8 @@ def _pandas_join_explosion(
 
     # Identify candidate key columns
     key_candidates = [
-        col for col in shared_cols
+        col
+        for col in shared_cols
         if (
             any(col.lower().endswith(s) for s in _KEY_SUFFIXES)
             or pd.api.types.is_integer_dtype(before[col])
@@ -657,25 +659,21 @@ def _pandas_join_explosion(
             duplication_ratio=duplication_ratio,
         )
 
-    offending_columns: List[str]                       = []
-    top_offenders    : Dict[str, List[Tuple[Any, int]]] = {}
+    offending_columns: List[str] = []
+    top_offenders: Dict[str, List[Tuple[Any, int]]] = {}
 
     for col in key_candidates:
         try:
             # Max repeat count before vs after
             before_max = int(before[col].value_counts().max()) if len(before) else 0
-            after_max  = int(after[col].value_counts().max())  if len(after)  else 0
+            after_max = int(after[col].value_counts().max()) if len(after) else 0
 
             # Fan-out signal: the max repeat count grew
             if after_max > before_max and after_max > 1:
                 offending_columns.append(col)
 
                 # Top offenders — values with highest repeat count
-                top = (
-                    after[col]
-                    .value_counts()
-                    .head(_TOP_OFFENDERS_N)
-                )
+                top = after[col].value_counts().head(_TOP_OFFENDERS_N)
                 top_offenders[col] = [(val, int(cnt)) for val, cnt in top.items()]
         except Exception:  # pylint: disable=broad-except
             # A column that looks like a key but can't be value-counted
@@ -690,9 +688,9 @@ def _pandas_join_explosion(
 
     return JoinExplosionDetail(
         duplicate_key_detected=bool(offending_columns),
-        offending_columns     =offending_columns,
-        top_offenders         =top_offenders,
-        duplication_ratio     =duplication_ratio,
+        offending_columns=offending_columns,
+        top_offenders=top_offenders,
+        duplication_ratio=duplication_ratio,
     )
 
 

@@ -26,7 +26,6 @@
 from __future__ import annotations
 
 import warnings
-from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
@@ -36,7 +35,6 @@ import pytest
 # ---------------------------------------------------------------------------
 from watcher.core import (
     BackendRegistry,
-    DataFrameLike,
     MemoryMode,
     StepResult,
     WatcherSession,
@@ -55,6 +53,7 @@ from watcher.stats import StepStats, ColumnDiff, JoinExplosionDetail
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _empty_stats() -> StepStats:
     """Return a minimal StepStats with no changes detected."""
@@ -199,21 +198,30 @@ class TestWatcherSession:
 
     def test_summary_multiple_steps(self):
         sess = WatcherSession(name="multi")
-        sess.record(_make_step(rows_in=1000, rows_out=900))   # lost 100
-        sess.record(_make_step(rows_in=900,  rows_out=950))   # gained 50
+        sess.record(_make_step(rows_in=1000, rows_out=900))  # lost 100
+        sess.record(_make_step(rows_in=900, rows_out=950))  # gained 50
         s = sess.summary()
         assert s["total_steps"] == 2
-        assert s["total_rows_in"]  == 1000
+        assert s["total_rows_in"] == 1000
         assert s["total_rows_out"] == 950
-        assert s["total_rows_lost"]   == -100
+        assert s["total_rows_lost"] == -100
         assert s["total_rows_gained"] == 50
 
     def test_summary_steps_list_structure(self):
         sess = WatcherSession(name="struct")
         sess.record(_make_step())
         step_dict = sess.summary()["steps"][0]
-        for key in ("func", "rows_in", "rows_out", "diff", "diff_pct",
-                    "elapsed_s", "memory_delta_mb", "join_explosion", "warned"):
+        for key in (
+            "func",
+            "rows_in",
+            "rows_out",
+            "diff",
+            "diff_pct",
+            "elapsed_s",
+            "memory_delta_mb",
+            "join_explosion",
+            "warned",
+        ):
             assert key in step_dict, f"missing key: {key}"
 
 
@@ -244,6 +252,7 @@ class TestSessionContextManager:
     def test_session_token_reset_after_exit(self):
         """After the context manager exits, there should be no active session."""
         from watcher.core import _get_active_session
+
         with session("temp"):
             pass
         assert _get_active_session() is None
@@ -547,6 +556,7 @@ class TestEnsurePsutilAvailable:
 
     def test_falls_back_to_peak_when_psutil_absent(self):
         import watcher.core as core_mod
+
         original = core_mod._PSUTIL_AVAILABLE
         original_warned = core_mod._PSUTIL_WARNING_EMITTED
         try:
@@ -563,6 +573,7 @@ class TestEnsurePsutilAvailable:
 
     def test_off_mode_unchanged_regardless_of_psutil(self):
         import watcher.core as core_mod
+
         original = core_mod._PSUTIL_AVAILABLE
         try:
             core_mod._PSUTIL_AVAILABLE = False
@@ -592,10 +603,12 @@ class TestAssertDataFrameLike:
 
     def test_custom_protocol_object_passes(self):
         """Objects satisfying the DataFrameLike protocol should pass."""
+
         class FakeDF:
             @property
             def shape(self):
                 return (10, 2)
+
             @property
             def columns(self):
                 return ["a", "b"]
@@ -616,6 +629,7 @@ class TestBackendRegistry:
         # The pandas stats backend lives in stats.py — test via _detect_backend,
         # which is the actual code path used by core.py → compute_stats().
         from watcher.stats import _detect_backend
+
         df = _simple_df()
         backend = _detect_backend(df)
         assert backend is not None
@@ -624,7 +638,6 @@ class TestBackendRegistry:
         assert BackendRegistry.detect({"a": 1}) is None
 
     def test_register_idempotent(self):
-        from watcher.core import BackendAdapter
         # Registering the same adapter twice should not duplicate it
         initial_len = len(BackendRegistry._adapters)
 
@@ -632,9 +645,11 @@ class TestBackendRegistry:
             @staticmethod
             def accepts(obj):
                 return False
+
             @staticmethod
             def row_count(obj):
                 return 0
+
             @staticmethod
             def column_names(obj):
                 return []

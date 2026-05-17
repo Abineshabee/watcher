@@ -24,12 +24,14 @@ N = 1_000_000
 
 raw = pd.DataFrame(
     {
-        "order_id":    np.arange(N),
+        "order_id": np.arange(N),
         "customer_id": rng.integers(1, 50_000, size=N),
-        "product_id":  rng.integers(1, 5_000,  size=N),
-        "status":      rng.choice(["active", "cancelled", "pending", None], size=N, p=[0.6, 0.2, 0.15, 0.05]),
-        "revenue":     rng.uniform(5.0, 500.0, size=N).round(2),
-        "created_at":  pd.date_range("2023-01-01", periods=N, freq="1min"),
+        "product_id": rng.integers(1, 5_000, size=N),
+        "status": rng.choice(
+            ["active", "cancelled", "pending", None], size=N, p=[0.6, 0.2, 0.15, 0.05]
+        ),
+        "revenue": rng.uniform(5.0, 500.0, size=N).round(2),
+        "created_at": pd.date_range("2023-01-01", periods=N, freq="1min"),
     }
 )
 

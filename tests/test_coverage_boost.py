@@ -19,8 +19,6 @@ from watcher.core import (
     BackendRegistry,
     _resolve_memory_mode,
     _measure_memory,
-    _ensure_psutil_available,
-    _assert_dataframe_like,
     _check_thresholds,
 )
 from watcher.exceptions import ThresholdExceeded, WatcherWarning
@@ -39,6 +37,7 @@ from watcher.handlers import HandlerBase, register_handler, deregister_handler
 # =============================================================================
 # Helpers
 # =============================================================================
+
 
 def _make_step(
     func_name="step",
@@ -89,8 +88,8 @@ def _make_step(
 # core.py — _resolve_memory_mode edge cases
 # =============================================================================
 
-class TestResolveMemoryModeEdgeCases:
 
+class TestResolveMemoryModeEdgeCases:
     def test_invalid_string_raises_value_error(self):
         with pytest.raises(ValueError, match="Invalid track_memory"):
             _resolve_memory_mode("invalid_mode")
@@ -111,8 +110,8 @@ class TestResolveMemoryModeEdgeCases:
 # core.py — _measure_memory all three modes
 # =============================================================================
 
-class TestMeasureMemoryAllModes:
 
+class TestMeasureMemoryAllModes:
     def test_off_mode_zero_delta(self):
         result, delta = _measure_memory(MemoryMode.OFF, lambda: 42)
         assert result == 42
@@ -139,8 +138,8 @@ class TestMeasureMemoryAllModes:
 # core.py — watch decorator with memory modes via real DataFrames
 # =============================================================================
 
-class TestWatchMemoryModes:
 
+class TestWatchMemoryModes:
     def test_watch_rss_mode(self):
         @watch(track_memory=MemoryMode.RSS)
         def step(df):
@@ -197,8 +196,8 @@ class TestWatchMemoryModes:
 # core.py — _check_thresholds edge cases
 # =============================================================================
 
-class TestCheckThresholdsEdgeCases:
 
+class TestCheckThresholdsEdgeCases:
     def _step_with_gain(self, rows_in=100, rows_out=200):
         return _make_step(rows_in=rows_in, rows_out=rows_out)
 
@@ -254,8 +253,8 @@ class TestCheckThresholdsEdgeCases:
 # reporter.py — Reporter with all display flags
 # =============================================================================
 
-class TestReporterDisplayFlags:
 
+class TestReporterDisplayFlags:
     def test_show_memory_false_hides_memory(self, capsys):
         r = Reporter(show_memory=False)
         step = _make_step(memory_delta_mb=5.0, memory_mode=MemoryMode.RSS)
@@ -319,6 +318,7 @@ class TestReporterDisplayFlags:
 
     def test_dtype_change_shown(self, capsys):
         import watcher.reporter as reporter_mod
+
         dc = DtypeChange(column="id", before="int64", after="object", is_widening=False)
         step = _make_step(dtype_changes=[dc])
         original = reporter_mod._RICH_AVAILABLE
@@ -354,8 +354,8 @@ class TestReporterDisplayFlags:
 # reporter.py — _row_direction and _fmt_diff helpers
 # =============================================================================
 
-class TestReporterHelpers:
 
+class TestReporterHelpers:
     def test_row_direction_loss(self):
         step = _make_step(rows_in=1000, rows_out=500)
         sym, color = _row_direction(step)
@@ -391,14 +391,16 @@ class TestReporterHelpers:
 # stats.py — compute_stats with larger DataFrames (sampling path)
 # =============================================================================
 
-class TestComputeStatsSampling:
 
+class TestComputeStatsSampling:
     def test_sampling_triggered_above_threshold(self):
         rng = np.random.default_rng(0)
-        before = pd.DataFrame({
-            "id": np.arange(100_000),
-            "val": rng.uniform(0, 1, 100_000),
-        })
+        before = pd.DataFrame(
+            {
+                "id": np.arange(100_000),
+                "val": rng.uniform(0, 1, 100_000),
+            }
+        )
         after = before.copy()
         stats = compute_stats(before, after)
         assert stats.sampled is True
@@ -466,14 +468,16 @@ class TestComputeStatsSampling:
 # Integration — watch + session + handler full flow
 # =============================================================================
 
-class TestIntegrationFlow:
 
+class TestIntegrationFlow:
     def setup_method(self):
         from watcher import handlers as _h
+
         self._original = list(_h._handlers)
 
     def teardown_method(self):
         from watcher import handlers as _h
+
         _h._handlers[:] = self._original
 
     def test_full_pipeline_with_custom_handler(self):
@@ -486,11 +490,13 @@ class TestIntegrationFlow:
         recorder = Recorder()
         register_handler(recorder)
 
-        df = pd.DataFrame({
-            "id": range(1000),
-            "status": ["ok"] * 800 + [None] * 200,
-            "value": np.random.uniform(0, 100, 1000),
-        })
+        df = pd.DataFrame(
+            {
+                "id": range(1000),
+                "status": ["ok"] * 800 + [None] * 200,
+                "value": np.random.uniform(0, 100, 1000),
+            }
+        )
 
         @watch(track_memory="off")
         def clean(df):
@@ -556,27 +562,26 @@ class TestIntegrationFlow:
             with session("threshold test"):
                 big_drop(df)
 
+
 # =============================================================================
 # core.py — import-time registration coverage
 # =============================================================================
 
-class TestImportTimeCoverage:
 
+class TestImportTimeCoverage:
     def test_all_exports_importable(self):
         from watcher import (
-            watch, session, MemoryMode, StepResult, WatcherSession,
-            DataFrameLike, BackendRegistry, BackendAdapter,
-            WatcherError, WatcherWarning, ThresholdExceeded,
-            BackendError, ConfigurationError,
-            HandlerBase, TerminalHandler,
-            register_handler, deregister_handler,
+            watch,
+            session,
         )
+
         # All public names are importable
         assert watch is not None
         assert session is not None
 
     def test_backend_registry_has_pandas_registered(self):
         import pandas as pd
+
         adapter = BackendRegistry.detect(pd.DataFrame({"x": [1]}))
         assert adapter is not None
 

@@ -12,7 +12,8 @@ description = "Silent data watcher — tells you what your pipeline did to your 
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
-    { name = "Abineshabee", email = "abineshabee@gmail.com" },
+    { name = "Abineshabee" },
+    { email = "abineshabee@gmail.com" },
 ]
 keywords = ["dataframe", "pipeline", "data-quality", "pandas", "etl", "debugging"]
 classifiers = [

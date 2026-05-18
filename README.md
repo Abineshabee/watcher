@@ -85,6 +85,15 @@ filter_active() 1,069,104 → 631,822   ▼ -437,282 rows (-40.9%)   18.7 ms
 
 ---
 
+## Documentation
+
+- [Usage Guide](docs/usage.md)
+- [API Reference](docs/index.md)
+- [Examples](examples/)
+
+---
+
+For advanced pipeline patterns and debugging workflows, see the full documentation.
 ## Features
 
 ### Row tracking

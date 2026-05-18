@@ -37,7 +37,18 @@ pip install "watcher[full]"         # + Rich + psutil memory tracking
 ## Quickstart
 
 ```python
+import pandas as pd
 from watcher import watch, session
+
+raw = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4],
+    "status": ["active", "inactive", "active", None]
+})
+
+orders = pd.DataFrame({
+    "customer_id": [1, 3],
+    "amount": [250.0, 150.0]
+})
 
 @watch
 def clean(df):
@@ -51,10 +62,17 @@ def merge_orders(df):
 def filter_active(df):
     return df[df["status"] == "active"]
 
-with session("nightly ETL") as s:
-    df = clean(raw)
-    df = merge_orders(df)
-    df = filter_active(df)
+# 3. Run the session to see the watcher summary!
+if __name__ == "__main__":
+    with session("nightly ETL") as s:
+        df = clean(raw)
+        df = merge_orders(df)
+        df = filter_active(df)
+
+#=====================================
+# For more Examples    : exammples/
+# For Syntax and Usage : docs/usage.md
+# ====================================
 ```
 
 **Output — automatically, no extra code:**

@@ -7,9 +7,9 @@
 
 [![CI](https://github.com/Abineshabee/watcher/actions/workflows/ci.yml/badge.svg)](https://github.com/Abineshabee/watcher/actions)
 [![PyPI](https://img.shields.io/pypi/v/dfwatcher)](https://pypi.org/project/dfwatcher/)
+[![Python](https://img.shields.io/pypi/pyversions/dfwatcher)](https://pypi.org/project/dfwatcher/)
 [![Downloads](https://img.shields.io/pypi/dm/dfwatcher)](https://pypi.org/project/dfwatcher/)
 [![GitHub release](https://img.shields.io/github/v/release/Abineshabee/watcher)](https://github.com/Abineshabee/watcher/releases)
-[![Python](https://img.shields.io/pypi/pyversions/watcher)](https://pypi.org/project/watcher/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---

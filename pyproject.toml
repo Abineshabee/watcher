@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 # Project metadata
 # ---------------------------------------------------------------------------
 [project]
-name = "watcher"
+name = "py-watcher"
 version = "0.1.0"
 description = "Silent data watcher — tells you what your pipeline did to your data."
 readme = "README.md"

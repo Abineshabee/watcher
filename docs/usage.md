@@ -5,9 +5,9 @@
 ## Install
 
 ```bash
-pip install watcher                 # pandas only
-pip install "watcher[rich]"         # + coloured terminal output
-pip install "watcher[full]"         # + Rich + psutil (recommended)
+pip install dfwatcher                 # pandas only
+pip install "dfwatcher[rich]"         # + coloured terminal output
+pip install "dfwatcher[full]"         # + Rich + psutil (recommended)
 ```
 
 ---

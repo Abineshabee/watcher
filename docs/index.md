@@ -94,13 +94,13 @@ watcher is structured as four decoupled layers. Each layer has a single responsi
 
 ```bash
 # Core only (pandas required separately)
-pip install watcher
+pip install dfwatcher
 
 # + coloured terminal output
-pip install "watcher[rich]"
+pip install "dfwatcher[rich]"
 
 # + Rich + psutil (full RSS memory tracking)
-pip install "watcher[full]"
+pip install "dfwatcher[full]"
 ```
 
 **Dependency matrix:**

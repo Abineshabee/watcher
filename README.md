@@ -32,9 +32,9 @@ Which step dropped the rows? Was it a filter, a null drop, or a bad join? You ha
 ## Install
 
 ```bash
-pip install watcher                 # core only (pandas)
-pip install "watcher[rich]"         # + coloured terminal output
-pip install "watcher[full]"         # + Rich + psutil memory tracking
+pip install dfwatcher                 # core only (pandas)
+pip install "dfwatcher[rich]"         # + coloured terminal output
+pip install "dfwatcher[full]"         # + Rich + psutil memory tracking
 ```
 
 ---

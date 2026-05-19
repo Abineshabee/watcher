@@ -1,7 +1,6 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
-
 # ---------------------------------------------------------------------------
 # Project metadata
 # ---------------------------------------------------------------------------
@@ -33,7 +32,13 @@ requires-python = ">=3.10"
 dependencies = [
     "pandas>=1.5",
 ]
-
+# ---------------------------------------------------------------------------
+# Project URLs
+# ---------------------------------------------------------------------------
+[project.urls]
+Homepage = "https://github.com/Abineshabee/watcher"
+Documentation = "https://github.com/Abineshabee/watcher/blob/main/docs/usage.md"
+"Bug Tracker" = "https://github.com/Abineshabee/watcher/issues"
 # ---------------------------------------------------------------------------
 # Optional dependency groups
 # ---------------------------------------------------------------------------
@@ -48,14 +53,12 @@ dev    = [
     "rich>=13.0",
     "psutil>=5.9",
 ]
-
 # ---------------------------------------------------------------------------
 # Package discovery
 # ---------------------------------------------------------------------------
 [tool.setuptools.packages.find]
 where   = ["."]
 include = ["watcher*"]
-
 # ---------------------------------------------------------------------------
 # pytest configuration
 # ---------------------------------------------------------------------------
@@ -65,7 +68,6 @@ addopts   = "-v --tb=short"
 filterwarnings = [
     "default::watcher.exceptions.WatcherWarning",
 ]
-
 # ---------------------------------------------------------------------------
 # Coverage configuration
 # ---------------------------------------------------------------------------
@@ -73,9 +75,6 @@ filterwarnings = [
 source         = ["watcher"]
 branch         = true
 relative_files = true
-# Do NOT omit watcher/__init__.py — it is covered and counts toward the
-# 80 % threshold.  The conftest.py module-reload trick ensures it is traced.
-
 [tool.coverage.report]
 show_missing  = true
 skip_covered  = false
@@ -84,14 +83,11 @@ exclude_lines = [
     "pragma: no cover",
     "if TYPE_CHECKING:",
     "raise NotImplementedError",
-    "^\\s*\\.\\.\\.\\s*$",        # standalone protocol / abstract-method stubs only
+    "^\\s*\\.\\.\\.\\s*$",
 ]
-
 [tool.coverage.paths]
-# Map coverage hits back to the source tree regardless of how/where the
-# package was installed (editable, wheel, CI, local dev, Linux, Windows).
 watcher = [
-    "watcher",                      # local source, relative to project root
-    "*/site-packages/watcher",      # Unix site-packages (non-editable installs)
-    "*\\site-packages\\watcher",    # Windows site-packages (non-editable installs)
+    "watcher",
+    "*/site-packages/watcher",
+    "*\\site-packages\\watcher",
 ]

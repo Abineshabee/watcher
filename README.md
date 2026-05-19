@@ -11,6 +11,7 @@
 [![Downloads](https://img.shields.io/pypi/dm/dfwatcher)](https://pypi.org/project/dfwatcher/)
 [![GitHub release](https://img.shields.io/github/v/release/Abineshabee/watcher)](https://github.com/Abineshabee/watcher/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![DOI](https://zenodo.org/badge/1241415139.svg)](https://doi.org/10.5281/zenodo.20286838)
 
 ---
 

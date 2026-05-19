@@ -1,4 +1,3 @@
-# watcher
 
 <p align="center">
   <img src="assets/logo/watcher_logo_text_right.svg" width="500">

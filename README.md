@@ -5,7 +5,7 @@
 
 > **The silent data watcher.** Decorates your pipeline functions and tells you exactly what happened to your data — row counts, schema drift, null changes, memory usage, join explosions — automatically, with zero config.
 
-[![PyPI](https://img.shields.io/pypi/v/dfwatcher)](https://pypi.org/project/dfwatcher/)
+[![PyPI](https://img.shields.io/pypi/v/dfwatcher?cache=0)](https://pypi.org/project/dfwatcher/)
 [![Python](https://img.shields.io/pypi/pyversions/dfwatcher)](https://pypi.org/project/dfwatcher/)
 [![CI](https://github.com/Abineshabee/watcher/actions/workflows/ci.yml/badge.svg)](https://github.com/Abineshabee/watcher/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)

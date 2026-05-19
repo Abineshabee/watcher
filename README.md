@@ -8,7 +8,6 @@
 [![PyPI](https://img.shields.io/pypi/v/dfwatcher)](https://pypi.org/project/dfwatcher/)
 [![Python](https://img.shields.io/pypi/pyversions/dfwatcher)](https://pypi.org/project/dfwatcher/)
 [![CI](https://github.com/Abineshabee/watcher/actions/workflows/ci.yml/badge.svg)](https://github.com/Abineshabee/watcher/actions)
-[![Downloads](https://img.shields.io/pepy/dt/dfwatcher)](https://pepy.tech/project/dfwatcher)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20286838-blue)](https://doi.org/10.5281/zenodo.20286838)
 [![GitHub release](https://img.shields.io/github/v/release/Abineshabee/watcher)](https://github.com/Abineshabee/watcher/releases)

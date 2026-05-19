@@ -1,7 +1,7 @@
 # watcher
 
 <p align="center">
-  <img src="assets/logo/watcher_logo_text_right.svg" width="500">
+  <img src="assets/logo/watcher_logo_text_right.svg" width="600">
 </p>
 
 > **The silent data watcher.** Decorates your pipeline functions and tells you exactly what happened to your data — row counts, schema drift, null changes, memory usage, join explosions — automatically, with zero config.

@@ -42,7 +42,7 @@ with session("row tracking demo"):
 **Output — automatically, no extra code:**
 
 <p align="center">
-  <img src="./assets/screenshorts/row_tracking.png" width="800">
+  <img src="../assets/screenshorts/row_tracking.png" width="800">
 </p>
 
 ---
@@ -90,7 +90,7 @@ with session("null delta tracking demo"):
 **Output — automatically, no extra code:**
 
 <p align="center">
-  <img src="./assets/screenshorts/null_count_delta.png" width="800">
+  <img src="../assets/screenshorts/null_count_delta.png" width="800">
 </p>
 
 ---
@@ -143,7 +143,7 @@ with session("schema drift demo"):
 **Output — automatically, no extra code:**
 
 <p align="center">
-  <img src="./assets/screenshorts/schema_drift_tracking.png" width="800">
+  <img src="../assets/screenshorts/schema_drift_tracking.png" width="800">
 </p>
 
 ---
@@ -194,7 +194,7 @@ with session("dtype change detection demo"):
 **Output — automatically, no extra code:**
 
 <p align="center">
-  <img src="./assets/screenshorts/dtype_change_detection.png" width="800">
+  <img src="../assets/screenshorts/dtype_change_detection.png" width="800">
 </p>
 
 ---
@@ -240,7 +240,7 @@ with session("silent data explosion detector") as s:
 **Output — automatically, no extra code:**
 
 <p align="center">
-  <img src="./assets/screenshorts/join_explosion.png" width="800">
+  <img src="../assets/screenshorts/join_explosion.png" width="800">
 </p>
 
 ---
@@ -322,7 +322,7 @@ with session("threshold guards demo") as s:
 **Output — automatically, no extra code:**
 
 <p align="center">
-  <img src="./assets/screenshorts/threshold_guards.png" width="800">
+  <img src="../assets/screenshorts/threshold_guards.png" width="800">
 </p>
 
 ---
@@ -378,7 +378,7 @@ with session("memory tracking demo"):
 **Output — automatically, no extra code:**
 
 <p align="center">
-  <img src="./assets/screenshorts/memory_tracking.png" width="800">
+  <img src="../assets/screenshorts/memory_tracking.png" width="800">
 </p>
 
 ---
@@ -470,7 +470,7 @@ print(summary)
 **Output — automatically, no extra code:**
 
 <p align="center">
-  <img src="./assets/screenshorts/session_grouping.png" width="800">
+  <img src="../assets/screenshorts/session_grouping.png" width="800">
 </p>
 
 ---
@@ -574,7 +574,7 @@ deregister_handler(handler)
 **Output — automatically, no extra code:**
 
 <p align="center">
-  <img src="./assets/screenshorts/custom_handlers.png" width="800">
+  <img src="../assets/screenshorts/custom_handlers.png" width="800">
 </p>
 
 ---

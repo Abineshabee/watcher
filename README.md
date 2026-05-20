@@ -102,6 +102,43 @@ For advanced pipeline patterns and debugging workflows, see the full documentati
 
 Every decorated function shows rows before → after, the signed diff, percentage change, and elapsed time. Nothing is hidden, nothing needs configuring.
 
+```python
+import pandas as pd
+from watcher import watch, session
+
+
+data = pd.DataFrame({
+    "id": [1, 2, 3, 4, 5],
+    "status": ["active", "inactive", "active", None, "active"],
+    "amount": [100, 200, 300, 400, 500]
+})
+
+
+@watch
+def step_1_drop_nulls(df):
+    return df.dropna()
+
+
+@watch
+def step_2_filter_active(df):
+    return df[df["status"] == "active"]
+
+
+@watch
+def step_3_double_amount(df):
+    df = df.copy()
+    df["amount"] = df["amount"] * 2
+    return df
+
+
+with session("row tracking demo"):
+    df = step_1_drop_nulls(data)
+    df = step_2_filter_active(df)
+    df = step_3_double_amount(df)
+```
+
+**Output — automatically, no extra code:**
+
 <p align="center">
   <img src="assets/screenshorts/row_tracking.png" width="800">
 </p>
@@ -111,6 +148,44 @@ Every decorated function shows rows before → after, the signed diff, percentag
 ### Null-count deltas
 
 Per-column null counts are compared before and after each step. The worst offenders are shown first.
+
+```python
+import pandas as pd
+from watcher import watch, session
+
+
+data = pd.DataFrame({
+    "id": [1, 2, 3, 4, 5],
+    "status": ["active", None, "active", None, "inactive"],
+    "amount": [100, None, 300, 400, None]
+})
+
+
+@watch
+def step_1_fill_nulls(df):
+    return df.fillna({
+        "status": "unknown",
+        "amount": 0
+    })
+
+
+@watch
+def step_2_filter_active(df):
+    return df[df["status"] == "active"]
+
+
+@watch
+def step_3_drop_missing_amount(df):
+    return df[df["amount"] > 0]
+
+
+with session("null delta tracking demo"):
+    df = step_1_fill_nulls(data)
+    df = step_2_filter_active(df)
+    df = step_3_drop_missing_amount(df)
+```
+
+**Output — automatically, no extra code:**
 
 <p align="center">
   <img src="assets/screenshorts/null_count_delta.png" width="800">
@@ -122,6 +197,49 @@ Per-column null counts are compared before and after each step. The worst offend
 
 Columns added or removed between steps are detected and reported immediately.
 
+```python
+import pandas as pd
+from watcher import watch, session
+
+
+data = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4],
+    "status": ["active", "inactive", "active", "active"],
+    "amount": [100, 200, 300, 400]
+})
+
+
+orders = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4],
+    "order_value": [50, 60, 70, 80]
+})
+
+
+@watch
+def step_1_add_feature(df):
+    df = df.copy()
+    df["amount_with_tax"] = df["amount"] * 1.18
+    return df
+
+
+@watch
+def step_2_merge_orders(df):
+    return df.merge(orders, on="customer_id", how="left")
+
+
+@watch
+def step_3_drop_columns(df):
+    return df.drop(columns=["status"])
+
+
+with session("schema drift demo"):
+    df = step_1_add_feature(data)
+    df = step_2_merge_orders(df)
+    df = step_3_drop_columns(df)
+```
+
+**Output — automatically, no extra code:**
+
 <p align="center">
   <img src="assets/screenshorts/schema_drift_tracking.png" width="800">
 </p>
@@ -132,6 +250,47 @@ Columns added or removed between steps are detected and reported immediately.
 
 If a step changes a column's dtype — widening (`int32` → `int64`) or narrowing (`float64` → `object`) — watcher flags it.
 
+```python
+import pandas as pd
+from watcher import watch, session
+
+
+data = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4],
+    "age": [25, 30, 35, 40],
+    "salary": [50000.0, 60000.0, 70000.0, 80000.0]
+})
+
+
+@watch
+def step_1_int_to_float(df):
+    df = df.copy()
+    df["age"] = df["age"].astype(float)
+    return df
+
+
+@watch
+def step_2_float_to_object(df):
+    df = df.copy()
+    df["salary"] = df["salary"].astype(str)
+    return df
+
+
+@watch
+def step_3_mixed_transform(df):
+    df = df.copy()
+    df["customer_id"] = df["customer_id"].astype("object")
+    return df
+
+
+with session("dtype change detection demo"):
+    df = step_1_int_to_float(data)
+    df = step_2_float_to_object(df)
+    df = step_3_mixed_transform(df)
+```
+
+**Output — automatically, no extra code:**
+
 <p align="center">
   <img src="assets/screenshorts/dtype_change_detection.png" width="800">
 </p>
@@ -141,6 +300,42 @@ If a step changes a column's dtype — widening (`int32` → `int64`) or narrowi
 ### Join explosion detection
 
 When a merge fans out unexpectedly, watcher tells you which key column caused it, which values are duplicated, and how many times — not just that rows were gained.
+
+```python
+import pandas as pd
+from watcher import watch, session
+
+# small dataset that becomes a BIG problem silently
+users = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4, 5],
+    "status": ["active", "active", "inactive", None, "active"],
+})
+
+orders = pd.DataFrame({
+    "customer_id": [1, 1, 2, 2, 2, 3, 3, 3],
+    "amount": [10, 20, 30, 40, 50, 60, 70, 80],
+})
+
+@watch
+def clean(df):
+    return df.dropna()
+
+@watch
+def join(df):
+    return df.merge(orders, on="customer_id", how="left")
+
+@watch
+def final(df):
+    return df.groupby("customer_id").sum().reset_index()
+
+
+with session("silent data explosion detector") as s:
+    df = clean(users)
+    df = join(df)
+    df = final(df)
+```
+
+**Output — automatically, no extra code:**
 
 <p align="center">
   <img src="assets/screenshorts/join_explosion.png" width="800">

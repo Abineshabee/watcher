@@ -81,29 +81,9 @@ if __name__ == "__main__":
 
 **Output — automatically, no extra code:**
 
-```
-──────────────────────── watcher · nightly ETL ─────────────────────────
-clean()          1,000,000 → 964,203   ▼  -35,797 rows  (-3.6%)   12.3 ms
-  nulls -35,797  status  (35,797 → 0)
-
-merge_orders()     964,203 → 1,069,104  ▲ +104,901 rows (+10.9%)  ⚠  41.1 ms
-  columns added : +tier
-  💥 join explosion · duplication ratio 10.9%
-  key column     top value    repeat count
-  customer_id    9182               184
-  customer_id    3310                97
-
-filter_active() 1,069,104 → 631,822   ▼ -437,282 rows (-40.9%)   18.7 ms
-
-╭──────────────── watcher · nightly ETL · summary ───────────────────╮
-│  step            rows in    rows out      Δ rows   time (ms)       │
-│  clean         1,000,000     964,203     -35,797       12.3        │
-│  merge_orders    964,203   1,069,104    +104,901       41.1        │
-│  filter_active 1,069,104     631,822    -437,282       18.7        │
-│                                                                    │
-│  total  1,000,000 → 631,822  (-368,178 rows)  72.1 ms              │
-╰────────────────────────────────────────────────────────────────────╯
-```
+<p align="center">
+  <img src="assets/screenshorts/quick_start_output.png" width="800">
+</p>
 
 ---
 

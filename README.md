@@ -149,15 +149,9 @@ coerce_step()  10,000 → 10,000  ● +0 rows
 
 When a merge fans out unexpectedly, watcher tells you which key column caused it, which values are duplicated, and how many times — not just that rows were gained.
 
-```
-merge_orders()  10,000 → 20,000  ▲ +10,000 rows (+100.0%) ⚠ 💥 join explosion
-  columns added : +tier
-  join explosion · duplication ratio 100.0%
-  key column     top value    repeat count
-  customer_id    72                    30
-  customer_id    383                   30
-  customer_id    1034                  28
-```
+<p align="center">
+  <img src="assets/screenshorts/join_explosion.png" width="800">
+</p>
 
 ---
 

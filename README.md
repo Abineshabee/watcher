@@ -102,9 +102,9 @@ For advanced pipeline patterns and debugging workflows, see the full documentati
 
 Every decorated function shows rows before → after, the signed diff, percentage change, and elapsed time. Nothing is hidden, nothing needs configuring.
 
-```
-drop_nulls()  1,000,000 → 921,330  ▼ -78,670 rows (-7.9%)  68.5 ms
-```
+<p align="center">
+  <img src="assets/screenshorts/row_tracking.png" width="800">
+</p>
 
 ---
 
@@ -112,11 +112,9 @@ drop_nulls()  1,000,000 → 921,330  ▼ -78,670 rows (-7.9%)  68.5 ms
 
 Per-column null counts are compared before and after each step. The worst offenders are shown first.
 
-```
-drop_nulls()  1,000,000 → 921,330  ▼ -78,670 rows (-7.9%)
-  nulls -2,477  status   (2,477 → 0)
-  nulls -1,448  revenue  (1,448 → 0)
-```
+<p align="center">
+  <img src="assets/screenshorts/null_count_delta.png" width="800">
+</p>
 
 ---
 
@@ -124,13 +122,9 @@ drop_nulls()  1,000,000 → 921,330  ▼ -78,670 rows (-7.9%)
 
 Columns added or removed between steps are detected and reported immediately.
 
-```
-add_revenue_band()  582,246 → 582,246  ● +0 rows
-  columns added   : +revenue_band
-
-drop_temp_columns() 582,246 → 582,246  ● +0 rows
-  columns removed : -created_at
-```
+<p align="center">
+  <img src="assets/screenshorts/schema_drift_tracking.png" width="800">
+</p>
 
 ---
 
@@ -138,10 +132,9 @@ drop_temp_columns() 582,246 → 582,246  ● +0 rows
 
 If a step changes a column's dtype — widening (`int32` → `int64`) or narrowing (`float64` → `object`) — watcher flags it.
 
-```
-coerce_step()  10,000 → 10,000  ● +0 rows
-  dtype change : customer_id  int64 → object
-```
+<p align="center">
+  <img src="assets/screenshorts/dtype_change_detection.png" width="800">
+</p>
 
 ---
 

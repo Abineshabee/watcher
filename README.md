@@ -132,7 +132,7 @@ For advanced pipeline patterns and debugging workflows, see the full documentati
 ## Development
 
 ```bash
-git clone https://github.com/Abineshabee/watcher
+git clone https://github.com/Abineshabee/watcher.git
 cd watcher
 pip install -e ".[dev]"
 pytest tests/ -v --cov=watcher

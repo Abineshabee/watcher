@@ -15,7 +15,7 @@
 
 ## The problem
 
-You run a data pipeline. The output looks wrong. Your only clue:
+You run a data pipeline. The output is wrong — but the real problem is you don’t know where it went wrong.
 
 ```python
 import pandas as pd

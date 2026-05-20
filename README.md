@@ -17,9 +17,38 @@
 
 You run a data pipeline. The output looks wrong. Your only clue:
 
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    "customer_id": range(1, 1000001),
+    "status": (["active"] * 700000) + (["inactive"] * 300000),
+    "amount": [100] * 1000000
+})
+
+orders = pd.DataFrame({
+    "customer_id": range(1, 400001),  # 400,000 rows
+    "order_value": range(1, 400001)
+})
+
+print("Input rows:", len(df))
+
+df = df[df["status"] == "active"]
+df = df.merge(orders, on="customer_id", how="inner")
+df = df.dropna()
+
+print("Output rows:", len(df))
 ```
-Input:  1,000,000 rows
-Output:   263,979 rows
+
+**Output**
+
+<p align="center">
+  <img src="assets/screenshorts/quick_start_output.png" width="800">
+</p>
+
+```
+You can see the final number.  
+But not the story behind it.
 ```
 
 Which step dropped the rows? Was it a filter, a null drop, or a bad join? You have no idea without adding print statements everywhere and re-running the whole thing.

@@ -118,10 +118,10 @@ if __name__ == "__main__":
 
 ## Documentation
 
+- [Features](docs/features.md) **( Example with Sample Output )**
 - [Usage Guide](docs/usage.md)
 - [API Reference](docs/index.md)
 - [Examples](examples/)
-- [Features](docs/features.md)
 
 ---
 

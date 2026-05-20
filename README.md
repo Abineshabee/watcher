@@ -43,7 +43,7 @@ print("Output rows:", len(df))
 **Output**
 
 <p align="center">
-  <img src="assets/screenshorts/quick_start_output.png" width="800">
+  <img src="assets/screenshorts/reproduce.png" width="800">
 </p>
 
 ```

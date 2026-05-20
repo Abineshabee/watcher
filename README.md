@@ -370,6 +370,59 @@ except ThresholdExceeded as exc:
     raise
 ```
 
+**Example : Threshold Guards**
+
+```python
+import pandas as pd
+from watcher import watch, session
+from watcher.exceptions import ThresholdExceeded
+
+
+data = pd.DataFrame({
+    "customer_id": list(range(1, 11)),
+    "amount": [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+})
+
+orders = pd.DataFrame({
+    "customer_id": [1, 1, 2, 2, 2, 3, 3, 3, 3, 3],
+    "order_value": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+})
+
+
+@watch(warn_on_loss=0.20, raise_on_loss=0.50)
+def step_1_filter(df):
+    # simulate heavy data loss
+    return df[df["amount"] > 500]
+
+
+@watch(warn_on_gain=1.0, raise_on_gain=2.0)
+def step_2_join(df):
+    # simulate join explosion
+    return df.merge(orders, on="customer_id", how="left")
+
+
+@watch(warn_on_loss=0.10, raise_on_loss=0.30)
+def step_3_final_filter(df):
+    return df[df["order_value"] > 50]
+
+
+with session("threshold guards demo") as s:
+    try:
+        df = step_1_filter(data)
+        df = step_2_join(df)
+        df = step_3_final_filter(df)
+
+    except ThresholdExceeded as e:
+        print("🚨 Pipeline stopped due to threshold violation")
+        print(e)
+```
+
+**Output — automatically, no extra code:**
+
+<p align="center">
+  <img src="assets/screenshorts/threshold_guards.png" width="800">
+</p>
+
 ---
 
 ### Memory tracking
@@ -382,12 +435,49 @@ except ThresholdExceeded as exc:
 @watch(track_memory=False)    # alias for "off"
 ```
 
-Example output with RSS tracking on a 1M-row allocation:
+**Example : RSS Memory tracking**
 
+```python
+import pandas as pd
+import numpy as np
+from watcher import watch, session
+
+
+data = pd.DataFrame({
+    "id": range(1, 10001),
+    "value": np.random.rand(10000)
+})
+
+
+@watch(track_memory="rss")
+def step_1_expand(df):
+    # simulate memory increase
+    df["extra_1"] = df["value"] * 2
+    df["extra_2"] = df["value"] * 3
+    return df
+
+
+@watch(track_memory="rss")
+def step_2_filter(df):
+    return df[df["value"] > 0.5]
+
+
+@watch(track_memory="rss")
+def step_3_aggregate(df):
+    return df.groupby("id").sum().reset_index()
+
+
+with session("memory tracking demo"):
+    df = step_1_expand(data)
+    df = step_2_filter(df)
+    df = step_3_aggregate(df)
 ```
-big_allocation()  1,000,000 → 1,000,000  ● +0 rows  56.2 ms  mem +38.5 MB (rss)
-  columns added : +col1, +col2, +col3, +col4, +col5
-```
+
+**Output — automatically, no extra code:**
+
+<p align="center">
+  <img src="assets/screenshorts/memory_tracking.png" width="800">
+</p>
 
 ---
 
@@ -423,6 +513,64 @@ print(summary["total_elapsed_s"])
 }
 ```
 
+**Example : Session grouping**
+
+```python
+import pandas as pd
+from watcher import watch, session
+
+
+data = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4, 5],
+    "status": ["active", "inactive", "active", "active", None],
+    "amount": [100, 200, 300, 400, 500]
+})
+
+orders = pd.DataFrame({
+    "customer_id": [1, 2, 3, 4, 4],
+    "order_value": [10, 20, 30, 40, 50]
+})
+
+
+@watch
+def clean(df):
+    return df.dropna()
+
+
+@watch
+def enrich(df):
+    df["amount_taxed"] = df["amount"] * 1.18
+    return df
+
+
+@watch
+def merge(df):
+    return df.merge(orders, on="customer_id", how="left")
+
+
+@watch
+def score(df):
+    df["score"] = df["amount"] + df["order_value"]
+    return df
+
+
+with session("user pipeline — session grouping demo") as s:
+    df = clean(data)
+    df = enrich(df)
+    df = merge(df)
+    df = score(df)
+
+# Get full summary for CI / debugging
+summary = s.summary()
+print(summary)
+```
+
+**Output — automatically, no extra code:**
+
+<p align="center">
+  <img src="assets/screenshorts/session_grouping.png" width="800">
+</p>
+
 ---
 
 ### Custom handlers
@@ -456,6 +604,76 @@ register_handler(handler)
 deregister_handler(handler)
 print(json.dumps(handler.log, indent=2))
 ```
+**Example : Custom handlers**
+
+```python
+import json
+from watcher import watch, session, register_handler, deregister_handler
+from watcher.handlers import HandlerBase
+from watcher.core import StepResult
+
+
+# Custom handler that stores pipeline events as JSON logs
+class JSONLogHandler(HandlerBase):
+    def __init__(self):
+        self.logs = []
+
+    def on_step(self, step: StepResult):
+        self.logs.append({
+            "step": step.func_name,
+            "rows_in": step.rows_in,
+            "rows_out": step.rows_out,
+            "row_diff": step.row_diff,
+            "elapsed_ms": round(step.elapsed_s * 1000, 2),
+            "memory_mb": step.memory_delta_mb,
+            "join_explosion": step.is_join_explosion,
+        })
+
+    def on_session_end(self, session):
+        print("📦 JSON PIPELINE LOG:")
+        print(json.dumps(self.logs, indent=2))
+
+
+# Register handler
+handler = JSONLogHandler()
+register_handler(handler)
+
+
+# Sample pipeline
+@watch
+def step_1(df):
+    return df.dropna()
+
+@watch
+def step_2(df):
+    return df.merge(df, on="id", how="left")  # intentional explosion
+
+@watch
+def step_3(df):
+    return df[df["id"] > 2]
+
+
+data = __import__("pandas").DataFrame({
+    "id": [1, 2, 3, 4, 5],
+    "value": [10, 20, 30, 40, 50]
+})
+
+
+with session("custom handler demo"):
+    df = step_1(data)
+    df = step_2(df)
+    df = step_3(df)
+
+
+# Cleanup
+deregister_handler(handler)
+```
+
+**Output — automatically, no extra code:**
+
+<p align="center">
+  <img src="assets/screenshorts/custom_handlers.png" width="800">
+</p>
 
 ---
 

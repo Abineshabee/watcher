@@ -11,6 +11,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20286838-blue)](https://doi.org/10.5281/zenodo.20286838)
 [![GitHub release](https://img.shields.io/github/v/release/Abineshabee/watcher)](https://github.com/Abineshabee/watcher/releases)
+[![Discussions](https://img.shields.io/github/discussions/Abineshabee/watcher)](https://github.com/Abineshabee/watcher/discussions)
 ---
 
 ## The problem

@@ -124,9 +124,21 @@ if __name__ == "__main__":
 - [API Reference](docs/index.md)
 - [Examples](examples/)
 
+For advanced pipeline patterns and debugging workflows, see the full documentation.
+
 ---
 
-For advanced pipeline patterns and debugging workflows, see the full documentation.
+## 💬 Community & Support
+
+Have questions, ideas, or want to share your pipeline results?
+
+- 💡 Feature requests → GitHub Discussions  
+- 🐛 Bug reports → GitHub Issues  
+- 📊 Showcase your pipelines → Discussions  
+- 🙋 Help & usage → Discussions  
+
+👉 Join the conversation:
+https://github.com/Abineshabee/watcher/discussions
 
 ---
 

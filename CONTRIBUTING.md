@@ -228,13 +228,13 @@ If you are contributing a handler that is generally useful (JSON logger, Slack n
 
 Before opening a PR, confirm all of the following:
 
-- [ ] `pytest` passes with no failures
-- [ ] Coverage is at or above 80 %
-- [ ] New public functions and classes have docstrings
-- [ ] `__all__` in the relevant module is updated if you added a public name
-- [ ] `watcher/__init__.py` is updated if you added something to the public API
-- [ ] Examples still run: `python examples/basic_pipeline.py` and `python examples/threshold_demo.py`
-- [ ] The PR description explains *what* changed and *why*
+- [x] `pytest` passes with no failures
+- [x] Coverage is at or above 80 %
+- [x] New public functions and classes have docstrings
+- [x] `__all__` in the relevant module is updated if you added a public name
+- [x] `watcher/__init__.py` is updated if you added something to the public API
+- [x] Examples still run: `python examples/basic_pipeline.py` and `python examples/threshold_demo.py`
+- [x] The PR description explains *what* changed and *why*
 
 ---
 
